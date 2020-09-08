@@ -8,12 +8,11 @@ app.engine(".hbs", expressHandlebars({
 }))
 
 app.get("/", function(request, response){
-	
-	const model = {
-		hello: "hi!"
-	}
-	
-	response.render("start.hbs", model)
+	response.render("start.hbs")
+})
+
+app.get("/about", function(request, response){
+	response.render("about.hbs")
 })
 
 app.listen(8080)
