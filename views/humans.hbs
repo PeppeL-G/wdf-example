@@ -1,6 +1,10 @@
 <h1>Humans</h1>
-<ul>
-	{{#each humans}}
-		<li>{{name}}</li>
-	{{/each}}
-</ul>
+{{#if humans.length}}
+	<ul>
+		{{#each humans}}
+			<li><a href="/humans/{{id}}">{{name}}</a></li>
+		{{/each}}
+	</ul>
+{{else}}
+	<p>There are no humans.</p>
+{{/if}}

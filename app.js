@@ -35,4 +35,20 @@ app.get("/humans", function(request, response){
 	
 })
 
+app.get("/humans/:id", function(request, response){
+	
+	const id = request.params.id
+	
+	const human = humans.find(
+		h => h.id == id
+	)
+	
+	const model = {
+		human
+	}
+	
+	response.render("human.hbs", model)
+	
+})
+
 app.listen(8080)
