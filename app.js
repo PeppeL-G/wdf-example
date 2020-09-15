@@ -17,6 +17,8 @@ app.engine(".hbs", expressHandlebars({
 	defaultLayout: "main.hbs"
 }))
 
+app.use(express.static("static"))
+
 app.get("/", function(request, response){
 	response.render("start.hbs")
 })
