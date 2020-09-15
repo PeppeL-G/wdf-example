@@ -5,6 +5,8 @@
 	<p>Age: {{human.age}}</p>
 	<p>Id: {{human.id}}</p>
 	
+	<a href="/update-human/{{human.id}}">Upudate</a>
+	
 	<form action="/delete-human/{{human.id}}" method="POST">
 		<input type="submit" value="Delete">
 	</form>

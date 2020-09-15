@@ -63,6 +63,38 @@ app.post("/create-human", function(request, response){
 	
 })
 
+app.get("/update-human/:id", function(request, response){
+	
+	const id = request.params.id
+	
+	const human = humans.find(
+		h => h.id == id
+	)
+	
+	const model = {
+		human
+	}
+	
+	response.render("update-human.hbs", model)
+	
+})
+
+app.post("/update-human/:id", function(request, response){
+	
+	const id = request.params.id
+	const newName = request.body.name
+	const newAge = request.body.age
+	
+	const human = humans.find(
+		h => h.id == id
+	)
+	human.name = newName
+	human.age = newAge
+	
+	response.redirect("/update-human/"+id)
+	
+})
+
 app.post("/delete-human/:id", function(request, response){
 	
 	const id = request.params.id
