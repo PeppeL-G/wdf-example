@@ -1,5 +1,6 @@
 const express = require('express')
 const expressHandlebars = require('express-handlebars')
+const bodyParser = require('body-parser')
 
 const humans = [{
 	id: 1,
@@ -19,6 +20,10 @@ app.engine(".hbs", expressHandlebars({
 
 app.use(express.static("static"))
 
+app.use(bodyParser.urlencoded({
+	extended: false
+}))
+
 app.get("/", function(request, response){
 	response.render("start.hbs")
 })
@@ -34,6 +39,27 @@ app.get("/humans", function(request, response){
 	}
 	
 	response.render("humans.hbs", model)
+	
+})
+
+app.get("/create-human", function(request, response){
+	response.render("create-human.hbs")
+})
+
+app.post("/create-human", function(request, response){
+	
+	const name = request.body.name
+	const age = request.body.age
+	
+	const human = {
+		name,
+		age,
+		id: humans.length + 1
+	}
+	
+	humans.push(human)
+	
+	response.redirect("/humans/"+human.id)
 	
 })
 
