@@ -1,16 +1,17 @@
 const express = require('express')
 const expressHandlebars = require('express-handlebars')
 const bodyParser = require('body-parser')
+const sqlite3 = require('sqlite3')
 
-const humans = [{
-	id: 1,
-	name: "Alice",
-	age: 10
-}, {
-	id: 2,
-	name: "Bob",
-	age: 15
-}]
+const db = new sqlite3.Database("my-database.db")
+
+db.run(`
+	CREATE TABLE IF NOT EXISTS humans (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT,
+		age INTEGER
+	)
+`)
 
 const app = express()
 
@@ -34,11 +35,32 @@ app.get("/about", function(request, response){
 
 app.get("/humans", function(request, response){
 	
-	const model = {
-		humans
-	}
+	const query = "SELECT * FROM humans ORDER BY id"
 	
-	response.render("humans.hbs", model)
+	db.all(query, function(error, humans){
+		
+		if(error){
+			
+			console.log(error)
+			
+			const model = {
+				dbErrorOccurred: true
+			}
+			
+			response.render("humans.hbs", model)
+			
+		}else{
+			
+			const model = {
+				humans,
+				dbErrorOccurred: false
+			}
+			
+			response.render("humans.hbs", model)
+			
+		}
+		
+	})
 	
 })
 
@@ -51,15 +73,20 @@ app.post("/create-human", function(request, response){
 	const name = request.body.name
 	const age = request.body.age
 	
-	const human = {
-		name,
-		age,
-		id: humans.length + 1
-	}
+	const query = "INSERT INTO humans (name, age) VALUES (?, ?)"
+	const values = [name, age]
 	
-	humans.push(human)
-	
-	response.redirect("/humans/"+human.id)
+	db.run(query, values, function(error){
+		if(error){
+			
+			console.log(error)
+			
+			// TODO: Display error message.
+			
+		}else{
+			response.redirect("/humans/"+this.lastID)
+		}
+	})
 	
 })
 
@@ -67,15 +94,28 @@ app.get("/update-human/:id", function(request, response){
 	
 	const id = request.params.id
 	
-	const human = humans.find(
-		h => h.id == id
-	)
+	const query = "SELECT * FROM humans WHERE id = ?"
+	const values = [id]
 	
-	const model = {
-		human
-	}
-	
-	response.render("update-human.hbs", model)
+	db.get(query, values, function(error, human){
+		
+		if(error){
+			
+			console.log(error)
+			
+			// TODO: Display error message.
+			
+		}else{
+			
+			const model = {
+				human
+			}
+			
+			response.render("update-human.hbs", model)
+			
+		}
+		
+	})
 	
 })
 
@@ -85,13 +125,28 @@ app.post("/update-human/:id", function(request, response){
 	const newName = request.body.name
 	const newAge = request.body.age
 	
-	const human = humans.find(
-		h => h.id == id
-	)
-	human.name = newName
-	human.age = newAge
+	const query = `
+		UPDATE
+			humans
+		SET
+			name = ?,
+			age = ?
+		WHERE
+			id = ?
+	`
+	const values = [newName, newAge, id]
 	
-	response.redirect("/update-human/"+id)
+	db.run(query, values, function(error){
+		if(error){
+			
+			console.log(error)
+			
+			// TODO: Display error message.
+			
+		}else{
+			response.redirect("/humans/"+id)
+		}
+	})
 	
 })
 
@@ -99,13 +154,20 @@ app.post("/delete-human/:id", function(request, response){
 	
 	const id = request.params.id
 	
-	const humanIndex = humans.findIndex(
-		h => h.id == id
-	)
+	const query = "DELETE FROM humans WHERE id = ?"
+	const values = [id]
 	
-	humans.splice(humanIndex, 1)
-	
-	response.redirect("/humans")
+	db.run(query, values, function(error){
+		if(error){
+			
+			console.log(error)
+			
+			// TODO: Display error message.
+			
+		}else{
+			response.redirect("/humans")
+		}
+	})
 	
 })
 
@@ -113,15 +175,26 @@ app.get("/humans/:id", function(request, response){
 	
 	const id = request.params.id
 	
-	const human = humans.find(
-		h => h.id == id
-	)
+	const query = "SELECT * FROM humans WHERE id = ?"
+	const values = [id]
 	
-	const model = {
-		human
-	}
-	
-	response.render("human.hbs", model)
+	db.get(query, values, function(error, human){
+		if(error){
+			
+			console.log(error)
+			
+			// TODO: Display error message.
+			
+		}else{
+			
+			const model = {
+				human
+			}
+			
+			response.render("human.hbs", model)
+			
+		}
+	})
 	
 })
 

@@ -1,10 +1,16 @@
 <h1>Humans</h1>
-{{#if humans.length}}
-	<ul>
-		{{#each humans}}
-			<li><a href="/humans/{{id}}">{{name}}</a></li>
-		{{/each}}
-	</ul>
+{{#if dbErrorOccurred}}
+	<p>Can't display the page now, try again later.</p>
 {{else}}
-	<p>There are no humans.</p>
+	
+	{{#if humans.length}}
+		<ul>
+			{{#each humans}}
+				<li><a href="/humans/{{id}}">{{name}}</a></li>
+			{{/each}}
+		</ul>
+	{{else}}
+		<p>There are no humans.</p>
+	{{/if}}
+	
 {{/if}}
