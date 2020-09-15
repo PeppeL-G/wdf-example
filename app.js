@@ -63,6 +63,20 @@ app.post("/create-human", function(request, response){
 	
 })
 
+app.post("/delete-human/:id", function(request, response){
+	
+	const id = request.params.id
+	
+	const humanIndex = humans.findIndex(
+		h => h.id == id
+	)
+	
+	humans.splice(humanIndex, 1)
+	
+	response.redirect("/humans")
+	
+})
+
 app.get("/humans/:id", function(request, response){
 	
 	const id = request.params.id

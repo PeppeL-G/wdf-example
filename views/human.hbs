@@ -4,6 +4,11 @@
 	<p>Name: {{human.name}}</p>
 	<p>Age: {{human.age}}</p>
 	<p>Id: {{human.id}}</p>
+	
+	<form action="/delete-human/{{human.id}}" method="POST">
+		<input type="submit" value="Delete">
+	</form>
+	
 {{else}}
 	<p>No human with that ID exists.</p>
 {{/if}}
