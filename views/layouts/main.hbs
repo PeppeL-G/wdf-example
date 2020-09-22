@@ -15,9 +15,16 @@
 	<nav>
 		<ul>
 			<li><a href="/">Start</a></li>
-			<li><a href="/create-human">Create Human</a></li>
+			{{#if isLoggedIn}}
+				<li><a href="/create-human">Create Human</a></li>
+			{{/if}}
 			<li><a href="/humans">Humans</a></li>
 			<li><a href="/about">About</a></li>
+			{{#if isLoggedIn}}
+				<li><a href="/logout">Logout</a></li>
+			{{else}}
+				<li><a href="/login">Login</a></li>
+			{{/if}}
 		</ul>
 	</nav>
 	

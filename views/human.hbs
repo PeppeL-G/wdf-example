@@ -5,11 +5,13 @@
 	<p>Age: {{human.age}}</p>
 	<p>Id: {{human.id}}</p>
 	
-	<a href="/update-human/{{human.id}}">Update</a>
-	
-	<form action="/delete-human/{{human.id}}" method="POST">
-		<input type="submit" value="Delete">
-	</form>
+	{{#if isLoggedIn}}
+		<a href="/update-human/{{human.id}}">Update</a>
+		
+		<form action="/delete-human/{{human.id}}" method="POST">
+			<input type="submit" value="Delete">
+		</form>
+	{{/if}}
 	
 {{else}}
 	<p>No human with that ID exists.</p>
