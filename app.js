@@ -112,11 +112,15 @@ app.post("/create-human", function(request, response){
 	const name = request.body.name
 	const age = parseInt(request.body.age)
 	
-	const validationErrors = getHumanValidationErrors(name, age)
+	const errors = getHumanValidationErrors(name, age)
 	
-	if(0 < validationErrors.length){
+	if(!request.session.isLoggedIn){
+		errors.push("Must be logged in.")
+	}
+	
+	if(0 < errors.length){
 		const model = {
-			validationErrors,
+			errors,
 			name,
 			age
 		}
@@ -176,11 +180,15 @@ app.post("/update-human/:id", function(request, response){
 	const newName = request.body.name
 	const newAge = parseInt(request.body.age)
 	
-	const validationErrors = getHumanValidationErrors(newName, newAge)
+	const errors = getHumanValidationErrors(newName, newAge)
 	
-	if(0 < validationErrors.length){
+	if(!request.session.isLoggedIn){
+		errors.push("Must be logged in.")
+	}
+	
+	if(0 < errors.length){
 		const model = {
-			validationErrors,
+			errors,
 			human: {
 				id,
 				name: newName,
@@ -219,6 +227,8 @@ app.post("/update-human/:id", function(request, response){
 app.post("/delete-human/:id", function(request, response){
 	
 	const id = request.params.id
+	
+	// TODO: Add authorization.
 	
 	const query = "DELETE FROM humans WHERE id = ?"
 	const values = [id]
