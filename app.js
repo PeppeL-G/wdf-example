@@ -3,6 +3,8 @@ const expressHandlebars = require('express-handlebars')
 const bodyParser = require('body-parser')
 const sqlite3 = require('sqlite3')
 
+const HUMAN_NAME_MIN_LENGTH = 2
+
 const db = new sqlite3.Database("my-database.db")
 
 db.run(`
@@ -16,8 +18,27 @@ db.run(`
 const app = express()
 
 app.engine(".hbs", expressHandlebars({
-	defaultLayout: "main.hbs"
+	defaultLayout: "main.hbs",
+	extname: "hbs"
 }))
+
+function getHumanValidationErrors(name, age){
+	
+	const validationErrors = []
+	
+	if(name.length < HUMAN_NAME_MIN_LENGTH){
+		validationErrors.push("Name must be at least "+HUMAN_NAME_MIN_LENGTH+" characters.")
+	}
+	
+	if(isNaN(age)){
+		validationErrors.push("Age must be a number.")
+	}else if (age < 0){
+		validationErrors.push("Age must be 0 or greater.")
+	}
+	
+	return validationErrors
+	
+}
 
 app.use(express.static("static"))
 
@@ -71,7 +92,19 @@ app.get("/create-human", function(request, response){
 app.post("/create-human", function(request, response){
 	
 	const name = request.body.name
-	const age = request.body.age
+	const age = parseInt(request.body.age)
+	
+	const validationErrors = getHumanValidationErrors(name, age)
+	
+	if(0 < validationErrors.length){
+		const model = {
+			validationErrors,
+			name,
+			age
+		}
+		response.render("create-human.hbs", model)
+		return
+	}
 	
 	const query = "INSERT INTO humans (name, age) VALUES (?, ?)"
 	const values = [name, age]
@@ -123,7 +156,22 @@ app.post("/update-human/:id", function(request, response){
 	
 	const id = request.params.id
 	const newName = request.body.name
-	const newAge = request.body.age
+	const newAge = parseInt(request.body.age)
+	
+	const validationErrors = getHumanValidationErrors(newName, newAge)
+	
+	if(0 < validationErrors.length){
+		const model = {
+			validationErrors,
+			human: {
+				id,
+				name: newName,
+				age: newAge
+			}
+		}
+		response.render("update-human.hbs", model)
+		return
+	}
 	
 	const query = `
 		UPDATE

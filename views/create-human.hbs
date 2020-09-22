@@ -1,10 +1,11 @@
 <h1>Create Human</h1>
+{{> errors validationErrors}}
 <form action="" method="POST">
 	<div>
-		Name: <input type="text" name="name">
+		Name: <input type="text" name="name" value="{{name}}">
 	</div>
 	<div>
-		Age: <input type="number" name="age">
+		Age: <input type="number" name="age" value="{{age}}">
 	</div>
 	<input type="submit" value="Create Human">
 </form>
