@@ -6,9 +6,9 @@
 	<p>Id: {{human.id}}</p>
 	
 	{{#if isLoggedIn}}
-		<a href="/update-human/{{human.id}}">Update</a>
+		<a href="/humans/update/{{human.id}}">Update</a>
 		
-		<form action="/delete-human/{{human.id}}" method="POST">
+		<form action="/humans/delete/{{human.id}}" method="POST">
 			<input type="submit" value="Delete">
 		</form>
 	{{/if}}
