@@ -1,23 +1,13 @@
 const express = require('express')
 const expressHandlebars = require('express-handlebars')
 const bodyParser = require('body-parser')
-const sqlite3 = require('sqlite3')
 const expressSession = require('express-session')
 const SQLiteStore = require('connect-sqlite3')(expressSession)
+const db = require('./db')
 
 const HUMAN_NAME_MIN_LENGTH = 2
 const ADMIN_USERNAME = "admin"
 const ADMIN_PASSWORD = "abc123"
-
-const db = new sqlite3.Database("my-database.db")
-
-db.run(`
-	CREATE TABLE IF NOT EXISTS humans (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT,
-		age INTEGER
-	)
-`)
 
 const app = express()
 
@@ -74,9 +64,7 @@ app.get("/about", function(request, response){
 
 app.get("/humans", function(request, response){
 	
-	const query = "SELECT * FROM humans ORDER BY id"
-	
-	db.all(query, function(error, humans){
+	db.getAllHumans(function(error, humans){
 		
 		if(error){
 			
@@ -128,10 +116,7 @@ app.post("/create-human", function(request, response){
 		return
 	}
 	
-	const query = "INSERT INTO humans (name, age) VALUES (?, ?)"
-	const values = [name, age]
-	
-	db.run(query, values, function(error){
+	db.createHuman(name, age, function(error, id){
 		if(error){
 			
 			console.log(error)
@@ -139,7 +124,7 @@ app.post("/create-human", function(request, response){
 			// TODO: Display error message.
 			
 		}else{
-			response.redirect("/humans/"+this.lastID)
+			response.redirect("/humans/"+id)
 		}
 	})
 	
@@ -149,10 +134,7 @@ app.get("/update-human/:id", function(request, response){
 	
 	const id = request.params.id
 	
-	const query = "SELECT * FROM humans WHERE id = ?"
-	const values = [id]
-	
-	db.get(query, values, function(error, human){
+	db.getHumanById(id, function(error, human){
 		
 		if(error){
 			
@@ -199,18 +181,7 @@ app.post("/update-human/:id", function(request, response){
 		return
 	}
 	
-	const query = `
-		UPDATE
-			humans
-		SET
-			name = ?,
-			age = ?
-		WHERE
-			id = ?
-	`
-	const values = [newName, newAge, id]
-	
-	db.run(query, values, function(error){
+	db.updateHumanById(newName, newAge, id, function(error){
 		if(error){
 			
 			console.log(error)
@@ -230,10 +201,7 @@ app.post("/delete-human/:id", function(request, response){
 	
 	// TODO: Add authorization.
 	
-	const query = "DELETE FROM humans WHERE id = ?"
-	const values = [id]
-	
-	db.run(query, values, function(error){
+	db.deleteHumanById(id, function(error){
 		if(error){
 			
 			console.log(error)
@@ -251,10 +219,7 @@ app.get("/humans/:id", function(request, response){
 	
 	const id = request.params.id
 	
-	const query = "SELECT * FROM humans WHERE id = ?"
-	const values = [id]
-	
-	db.get(query, values, function(error, human){
+	db.getHumanById(id, function(error, human){
 		if(error){
 			
 			console.log(error)
